@@ -190,7 +190,7 @@ const clock = new THREE.Clock()
 for ( const mesh of donutList ) {
 
     gsap.to(mesh.rotation,{duration:4, x:"random(-1, 1)", y:"random(-10, 10)", yoyo:true, repeat:-1, ease:'power4.inOut'})
-    gsap.to(mesh.position,{duration:4, x:"random(-10, 10)", y:"random(-10, 10)", yoyo:true, repeat:-1, ease:'power4.inOut'})
+    gsap.to(mesh.position,{duration:4, x:"random(-1, 1)", y:"random(-1, 1)", yoyo:true, repeat:-1, ease:'power4.inOut'})
 
 }
 
