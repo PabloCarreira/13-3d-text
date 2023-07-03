@@ -3,12 +3,17 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry'
+import gsap from 'gsap'
 
 /**
  * Base
  */
 // Debug
 const gui = new dat.GUI()
+const parameters = {
+    myString:"HOLA PETE"
+}
+
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -19,8 +24,8 @@ const scene = new THREE.Scene()
 /**
  * Axis Helper
  */
-const AxesHelper = new THREE.AxesHelper()
-scene.add(AxesHelper)
+// const AxesHelper = new THREE.AxesHelper()
+// scene.add(AxesHelper)
 
 /**
  * Textures
@@ -38,7 +43,7 @@ fontLoader.load(
     '/fonts/helvetiker_regular.typeface.json',
     (font) => {
         const textGeometry = new TextGeometry(
-            'HOLA PETE',
+            parameters.myString,
             {
                 font:font,
                 size:0.5,
@@ -56,35 +61,77 @@ fontLoader.load(
         const textMaterial = new THREE.MeshMatcapMaterial()
         textMaterial.matcap = matcapTexture
         const text = new THREE.Mesh(textGeometry, textMaterial)
+        text.name = "textGeometryObject"
         scene.add(text)
 
-        const donutGeometry = new THREE.TorusBufferGeometry(0.3, 0.2, 20, 45)
-            const donutMaterial = new THREE.MeshMatcapMaterial()
-            donutMaterial.matcap = matcapTexture
-
-        for (let i = 0; i < 100; i++)
-        {
-            
-            const donut = new THREE.Mesh(donutGeometry, donutMaterial)
-
-            donut.position.x = (Math.random() - 0.5) * 5
-            donut.position.y = (Math.random() - 0.5) * 5
-            donut.position.z = (Math.random() - 0.5) * 5
-
-            donut.rotation.x = Math.random() * Math.PI
-            donut.rotation.y = Math.random() * Math.PI 
-
-            const scale = Math.random() * (0.4 - 0.2) + 0.2
-            donut.scale.set(scale, scale, scale)
-
-            scene.add(donut)
-        }
     }
 )
 
+gui.add( parameters, 'myString' );
+gui.onFinishChange(()=>{
+    let selectedObject = scene.getObjectByName("textGeometryObject");
+    scene.remove(selectedObject)
+    fontLoader.load(
+        '/fonts/helvetiker_regular.typeface.json',
+        (font) => {
+            const textGeometry = new TextGeometry(
+                parameters.myString,
+                {
+                    font:font,
+                    size:0.5,
+                    height:0.2,
+                    curveSegments: 12,
+                    bevelEnabled: true,
+                    bevelThickness: 0.03,
+                    bevelSize: 0.02,
+                    bevelOffset: 0,
+                    bevelSegments: 5
+                }
+            )
+            textGeometry.center()
+    
+            const textMaterial = new THREE.MeshMatcapMaterial()
+            textMaterial.matcap = matcapTexture
+            const text = new THREE.Mesh(textGeometry, textMaterial)
+            text.name = "textGeometryObject"
+            scene.add(text)
+    
+        }
+    )
+})
+
 /**
- * Object
+ * Objects
  */
+
+const donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45)
+const donutMaterial = new THREE.MeshMatcapMaterial()
+donutMaterial.matcap = matcapTexture
+
+const donutList = []
+
+for (let i = 0; i < 100; i++)
+{
+    
+    const donut = new THREE.Mesh(donutGeometry, donutMaterial)
+
+    donut.position.x = (Math.random() - 0.5) * 5
+    donut.position.y = (Math.random() - 0.5) * 5
+    donut.position.z = (Math.random() - 0.5) * 5
+
+    donut.rotation.x = Math.random() * Math.PI
+    donut.rotation.y = Math.random() * Math.PI 
+
+    const scale = Math.random() * (0.4 - 0.2) + 0.2
+    donut.scale.set(scale, scale, scale)
+
+    donutList.push(donut)
+
+    scene.add(donut)
+}
+
+console.log(donutList)
+
 
 /**
  * Sizes
@@ -137,6 +184,15 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  */
 const clock = new THREE.Clock()
 
+//Update Objects
+// donutList.forEach(()=>{gsap.to(.rotation,{duration:10, x:"+=1"})})
+
+for ( const mesh of donutList ) {
+
+    gsap.to(mesh.rotation,{duration:4, x:"random(-1, 1)", y:"random(-10, 10)", yoyo:true, repeat:-1, ease:'power4.inOut'})
+
+}
+
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
@@ -144,6 +200,8 @@ const tick = () =>
     // Update controls
     controls.update()
 
+    
+    
     // Render
     renderer.render(scene, camera)
 
