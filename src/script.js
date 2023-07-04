@@ -11,8 +11,20 @@ import gsap from 'gsap'
 // Debug
 const gui = new dat.GUI()
 const parameters = {
-    myString:"HOLA PETE"
+    myString:"Test Text",
+    shuffle: ()=>{
+        donutList.forEach((item)=>{
+            gsap.to(item.rotation,{duration:5, x:"+=10", y:"+=10", ease:'power4.out'})
+            gsap.to(item.position,{duration:5, 
+                x:(Math.random() - 0.5) * 5,
+                y:(Math.random() - 0.5) * 5,
+                z:(Math.random() - 0.5) * 5,
+                ease:'power4.out'})
+        })
+    }
 }
+gui
+    .add(parameters,'shuffle')
 
 
 // Canvas
@@ -32,6 +44,7 @@ const scene = new THREE.Scene()
  */
 const textureLoader = new THREE.TextureLoader()
 const matcapTexture = textureLoader.load('/textures/matcaps/2.png')
+const textMatcapTexture = textureLoader.load('/textures/matcaps/7.png')
 
 
 /**
@@ -59,7 +72,7 @@ fontLoader.load(
         textGeometry.center()
 
         const textMaterial = new THREE.MeshMatcapMaterial()
-        textMaterial.matcap = matcapTexture
+        textMaterial.matcap = textMatcapTexture
         const text = new THREE.Mesh(textGeometry, textMaterial)
         text.name = "textGeometryObject"
         scene.add(text)
@@ -91,7 +104,7 @@ gui.onFinishChange(()=>{
             textGeometry.center()
     
             const textMaterial = new THREE.MeshMatcapMaterial()
-            textMaterial.matcap = matcapTexture
+            textMaterial.matcap = textMatcapTexture
             const text = new THREE.Mesh(textGeometry, textMaterial)
             text.name = "textGeometryObject"
             scene.add(text)
@@ -109,6 +122,8 @@ const donutMaterial = new THREE.MeshMatcapMaterial()
 donutMaterial.matcap = matcapTexture
 
 const donutList = []
+const donutsGroup = new THREE.Group()
+
 
 for (let i = 0; i < 100; i++)
 {
@@ -125,11 +140,15 @@ for (let i = 0; i < 100; i++)
     const scale = Math.random() * (0.4 - 0.2) + 0.2
     donut.scale.set(scale, scale, scale)
 
+    donut.name = "donut n* " + i
+
     donutList.push(donut)
+    donutsGroup.add(donut)
 
     scene.add(donut)
 }
 
+scene.add(donutsGroup)
 console.log(donutList)
 
 
@@ -185,14 +204,30 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 const clock = new THREE.Clock()
 
 //Update Objects
-// donutList.forEach(()=>{gsap.to(.rotation,{duration:10, x:"+=1"})})
+//  donutList.forEach((item)=>{console.log(item)})
 
-for ( const mesh of donutList ) {
+donutList.forEach((item)=>{gsap.to(item.rotation,{duration:5, x:"+=10"})})
+donutsGroup.position.x = 1000
 
-    gsap.to(mesh.rotation,{duration:4, x:"random(-1, 1)", y:"random(-10, 10)", yoyo:true, repeat:-1, ease:'power4.inOut'})
-    gsap.to(mesh.position,{duration:4, x:"random(-1, 1)", y:"random(-1, 1)", yoyo:true, repeat:-1, ease:'power4.inOut'})
 
-}
+// for ( const mesh of donutList ) {
+
+// }
+
+// gsap.to(donutList.rotation,{duration:4, x:"random(-1, 1)", y:"random(-10, 10)",
+//     stagger: { // wrap advanced options in an object
+//         each: 0.1,
+//         from: "center",
+//         grid: "auto",
+//         ease: "power2.inOut"
+//       },    
+//     yoyo:true, repeat:-1, ease:'power4.inOut'})
+
+// console.log(donutsGroup)
+
+
+// gsap.to(donutsGroup.position,{duration:3, y:100, ease:'linear'})
+
 
 const tick = () =>
 {
