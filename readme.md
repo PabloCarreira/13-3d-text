@@ -1,4 +1,4 @@
-# Three.js Journey
+# Three.js Journey Lesson 13 expanded
 
 ## Setup
 Download [Node.js](https://nodejs.org/en/download/).
